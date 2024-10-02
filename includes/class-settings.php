@@ -109,6 +109,8 @@ class Settings {
 			return;
 		}
 
+		$options = Options::getCheckboxFields();
+
 		$template_file = WPCHILL_ANALYTICS_PLUGIN_DIR . '/includes/templates/settings-page.php';
 
 		if ( file_exists( $template_file ) ) {
@@ -251,8 +253,20 @@ class Settings {
 		Debugger::log( 'Input received: ' . print_r( $input, true ) );
 
 		$existing_options = Options::getOptions();
+		$checkbox_fields  = Options::getCheckboxFields();
 
-		// Merge input with existing options
+		// Preserve existing checkbox values
+		foreach ( $checkbox_fields as $field ) {
+			if ( ! isset( $input[ $field ] ) ) {
+				// If the field is not in the input, preserve its existing value
+				$input[ $field ] = isset( $existing_options[ $field ] ) ? $existing_options[ $field ] : false;
+			} else {
+				// If it is in the input, ensure it's boolean
+				$input[ $field ] = (bool) $input[ $field ];
+			}
+		}
+
+		// Merge input with existing options, prioritizing input values
 		$options_to_save = wp_parse_args( $input, $existing_options );
 
 		// Sanitize options using the Options class method

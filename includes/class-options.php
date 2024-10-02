@@ -60,16 +60,13 @@ class Options {
 	}
 
 	/**
-	 * Sanitize and validate options.
+	 * Get the list of checkbox fields.
 	 *
-	 * @param array $options The options to sanitize.
-	 *
-	 * @return array The sanitized options.
+	 * @return array List of checkbox field names.
 	 */
-	public static function sanitizeOptions( $options ): array {
-		$sanitized = [];
-
-		$checkbox_fields = [
+	public static function getCheckboxFields(): array
+	{
+		return [
 			'enabled',
 			'use_host_url',
 			'ignore_admins',
@@ -78,28 +75,46 @@ class Options {
 			'cache',
 			'track_comments'
 		];
-		$url_fields      = [ 'script_url', 'host_url' ];
-		$text_fields     = [ 'website_id' ];
+	}
 
-		foreach ( $checkbox_fields as $field ) {
-			$sanitized[ $field ] = isset( $options[ $field ] ) ? (bool) $options[ $field ] : false;
+	/**
+	 * Sanitize and validate options.
+	 *
+	 * @param array $options The options to sanitize.
+	 *
+	 * @return array The sanitized options.
+	 */
+	public static function sanitizeOptions($options): array
+	{
+		$sanitized = [];
+
+		$checkbox_fields = self::getCheckboxFields();
+		$url_fields = ['script_url', 'host_url'];
+		$text_fields = ['website_id'];
+
+		// Sanitize checkbox fields
+		foreach ($checkbox_fields as $field) {
+			$sanitized[$field] = isset($options[$field]) ? (bool) $options[$field] : false;
 		}
 
-		foreach ( $url_fields as $field ) {
-			$sanitized[ $field ] = isset( $options[ $field ] ) ? esc_url_raw( $options[ $field ] ) : '';
+		// Sanitize URL fields
+		foreach ($url_fields as $field) {
+			$sanitized[$field] = isset($options[$field]) ? esc_url_raw($options[$field]) : '';
 		}
 
-		foreach ( $text_fields as $field ) {
-			$sanitized[ $field ] = isset( $options[ $field ] ) ? sanitize_text_field( $options[ $field ] ) : '';
+		// Sanitize text fields
+		foreach ($text_fields as $field) {
+			$sanitized[$field] = isset($options[$field]) ? sanitize_text_field($options[$field]) : '';
 		}
 
-		if ( isset( $options['custom_events'] ) && is_array( $options['custom_events'] ) ) {
+		// Sanitize custom events
+		if (isset($options['custom_events']) && is_array($options['custom_events'])) {
 			$sanitized['custom_events'] = [];
-			foreach ( $options['custom_events'] as $event ) {
-				if ( isset( $event['selector'] ) && isset( $event['name'] ) ) {
+			foreach ($options['custom_events'] as $event) {
+				if (isset($event['selector']) && isset($event['name'])) {
 					$sanitized['custom_events'][] = [
-						'selector' => sanitize_text_field( $event['selector'] ),
-						'name'     => sanitize_text_field( $event['name'] )
+						'selector' => sanitize_text_field($event['selector']),
+						'name' => sanitize_text_field($event['name'])
 					];
 				}
 			}

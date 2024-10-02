@@ -29,6 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		settings_fields( 'wpchill_analytics_options' );
 		do_settings_sections( 'wpchill_analytics_' . $active_tab ); ?>
         <input type="hidden" name="tab" value="<?php echo esc_attr( $active_tab ); ?>">
+
 		<?php submit_button(); ?>
     </form>
 </div>
