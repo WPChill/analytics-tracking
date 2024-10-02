@@ -42,7 +42,7 @@ class Settings {
 	 * Add settings page to the menu.
 	 */
 	public function add_settings_page() {
-		add_options_page(
+		add_menu_page(
 			__( 'WPChill Analytics Settings', 'wpchill-analytics' ),
 			__( 'WPChill Analytics', 'wpchill-analytics' ),
 			'manage_options',
@@ -240,71 +240,26 @@ class Settings {
 	}
 
 	/**
-	 * Validate and sanitize user input.
+	 * Validate and sanitize incoming options.
 	 *
-	 * @param array $input The user input to validate.
+	 * @param array $input Array of input options to validate.
 	 *
-	 * @return array The validated and sanitized input.
-	 */
-	/**
-	 * Validate and sanitize user input.
-	 *
-	 * @param array $input The user input to validate.
-	 *
-	 * @return array The validated and sanitized input.
+	 * @return array Sanitized array of options.
 	 */
 	public function validate_options( $input ) {
-
 		Debugger::log( 'Validating options' );
 		Debugger::log( 'Input received: ' . print_r( $input, true ) );
 
-
 		$existing_options = Options::getOptions();
-		$validated        = $existing_options; // Start with existing options
 
-		$checkbox_fields = array(
-			'enabled',
-			'use_host_url',
-			'ignore_admins',
-			'auto_track',
-			'track_comments',
-			'do_not_track',
-			'cache'
-		);
-		$url_fields      = array( 'script_url', 'host_url' );
-		$text_fields     = array( 'website_id' );
+		// Merge input with existing options
+		$options_to_save = wp_parse_args( $input, $existing_options );
 
-		// Handle checkbox fields
-		foreach ( $checkbox_fields as $field ) {
-			$validated[ $field ] = isset( $input[ $field ] ) ? true : false;
-		}
+		// Sanitize options using the Options class method
+		$sanitized_options = Options::sanitizeOptions( $options_to_save );
 
-		// Handle URL and text fields
-		foreach ( array_merge( $url_fields, $text_fields ) as $field ) {
-			if ( isset( $input[ $field ] ) ) {
-				if ( in_array( $field, $url_fields ) ) {
-					$validated[ $field ] = esc_url_raw( $input[ $field ] );
-				} else {
-					$validated[ $field ] = sanitize_text_field( $input[ $field ] );
-				}
-			}
-		}
+		Debugger::log( 'Sanitized options: ' . print_r( $sanitized_options, true ) );
 
-		// Handle custom events (assuming this part was working correctly)
-		if ( isset( $input['custom_events'] ) && is_array( $input['custom_events'] ) ) {
-			$validated['custom_events'] = array();
-			foreach ( $input['custom_events'] as $event ) {
-				if ( isset( $event['selector'] ) && isset( $event['name'] ) ) {
-					$validated['custom_events'][] = array(
-						'selector' => sanitize_text_field( $event['selector'] ),
-						'name'     => sanitize_text_field( $event['name'] )
-					);
-				}
-			}
-		}
-
-		Debugger::log( 'Validated options: ' . print_r( $validated, true ) );
-
-		return $validated;
+		return $sanitized_options;
 	}
 }

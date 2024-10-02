@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: WPChill - Analytics plugin
-Plugin URI: https://github.com/wpchill/wpchill-analytics
+Plugin URI: https://github.com/wpchill/analytics-tracking
 Description: This plugin loads the Analytics tracking code as well as manage the events being tracked.
 Version: 1.0.0
 Author: Cristian Raiber
-Author URI: https://wpchill.cm
+Author URI: https://wpchill.com
 Text Domain: wpchill-analytics
 Domain Path: /languages
 */
